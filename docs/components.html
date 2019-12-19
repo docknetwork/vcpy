@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.7.2" />
+<title>verifiable_credentials.components API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>verifiable_credentials.components</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from abc import ABC, abstractmethod
+
+from attrdict import AttrDict
+from web3 import Web3
+
+from verifiable_credentials.helpers import NOW, factor_in_new_try
+
+
+class Issuer:
+    &#34;&#34;&#34;A basic version of an Issuer as defined by the Blockcerts standard.
+
+    More at: https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/issuerSchema.json
+
+    :param name: Name of the issuer
+    :param url: Url to the issuer&#39;s public profile (must resolve to a valid jsonld)
+    :param email: Email to contact the issuer
+    :param image: base64-encoded PNG or SVG that represents the issuer (a logo for example)
+    :param revocation_list: Url to the issuer&#39;s public revocation list (must resolve to a valid jsonld)
+    :param public_key: Public key owned by the issuer (or authorized to issue on their behalf).
+    :param signature_name: (optional) Name of the person signing the certificate
+    :param signature_job_title: (optional) Title of the person signing the certificate
+    :param signature_image: (optional) base64-encoded PNG or SVG that represents the signature of the person signing.
+
+    Note: All three of signature_name, signature_job_title and signature_image must exist in order for the signature
+    section to be added to the Blockcert.
+    &#34;&#34;&#34;
+
+    def __init__(
+            self: str,
+            name: str,
+            url: str,
+            email: str,
+            image: str,
+            revocation_list: str,
+            public_key: str,
+            signature_name: str = &#34;&#34;,
+            signature_job_title: str = &#34;&#34;,
+            signature_image: str = &#34;&#34;
+    ):
+        self.name = name
+        self.url = url
+        self.email = email
+        self.image = image
+        self.revocation_list = revocation_list
+        self.public_key = public_key
+        self.signature_name = signature_name
+        self.signature_job_title = signature_job_title
+        self.signature_image = signature_image
+
+
+class Assertion:
+    &#34;&#34;&#34;A basic version of an Assertion as defined by the Blockcerts standard.
+
+    More at https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/schema.json
+
+    :param id: id of the assertion
+    :param name: name of the assertion
+    :param description: description of the assertion
+    :param image: base64-encoded PNG or SVG that represents the assertion (a logo for example)
+    :param narrative: narrative of the assertion
+    :param display_html: (optional) valid HTML that will be displayed when validating in public validators
+    &#34;&#34;&#34;
+
+    def __init__(self, id: str, name: str, description: str, image: str, narrative: str, display_html: str = &#34;&#34;):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.image = image
+        self.narrative = narrative
+        self.display_html = display_html
+
+
+class Recipient:
+    &#34;&#34;&#34;A basic version of a Recipient as defined by the Blockcerts standard.
+
+    More at https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/recipientSchema.json
+
+    :param name: name of the recipient
+    :param email: email of the recipient
+    :param public_key: public key of the recipient
+    :param email_hashed: is the email hashed?
+    &#34;&#34;&#34;
+
+    def __init__(self, name: str, email: str, public_key: str, email_hashed: bool = False):
+        self.name = name
+        self.email = email
+        self.public_key = public_key
+        self.email_hashed = email_hashed
+
+
+class AnchorHandler(ABC):
+    &#34;&#34;&#34;Common interface for anchoring mechanisms.
+
+    :param chain_name: name of the chain, for now one of &#39;ethereumMainnet&#39; or &#39;ethereumRopsten&#39;, in the future at least
+    &#39;bitcoinMainnet&#39;, &#39;bitcoinRegtest&#39; and &#39;bitcoinTestnet&#39; should be added.
+    :param signature_field: transaction field where the merkle root will be posted. For now only &#39;ETHData&#39; will work, in
+    the future at least &#39;BTCOpReturn&#39; should be added.
+    &#34;&#34;&#34;
+
+    def __init__(self, chain_name: str):
+        raise NotImplementedError
+
+    @abstractmethod
+    def anchor(self, data) -&gt; str:
+        &#34;&#34;&#34;Anchor the given data to a Blockchain transaction.
+
+        :param data: data to be stored in a transaction, usually this is a merkle root but it may be a single hash if
+        the batch being issued consists of a single certificate.
+        :return: reference to the anchor, like a transaction id
+        &#34;&#34;&#34;
+        raise NotImplementedError
+
+
+class EthereumAnchorHandler(AnchorHandler):
+    &#34;&#34;&#34;Use the Ethereum blockchain to anchor.
+
+    :param node_url: url to an Ethereum node (can also be a 3rd party service url as Infura)
+    :param public_key: Public key to use to sign the transaction (the personal account must be funded)
+    :param private_key: Public key to use to sign the transaction (the personal account must be funded)
+    :param key_created_at: Ethereum account creation date.
+    :param max_retry: (optional) Amount of allowed retries if the anchoring operation fails
+    :param gas_price: (optional) desired gas price for the anchoring transaction
+    :param gas_limit: (optional) desired gas limit for the anchoring transaction
+    :param account_to: (optional) desired destination of the anchoring transaction
+    :param chain_name: (optional) one of ethereumRopsten or ethereumMainnet
+    &#34;&#34;&#34;
+    signature_field = &#39;ETHData&#39;
+
+    def __init__(
+            self,
+            node_url: str,
+            public_key: str,
+            private_key: str,
+            key_created_at: str,
+            max_retry: int = 3,
+            gas_price: int = 20000000000,
+            gas_limit: int = 25000,
+            account_to: str = &#39;0xdeaDDeADDEaDdeaDdEAddEADDEAdDeadDEADDEaD&#39;,
+            chain_name: str = &#39;ethereumRopsten&#39;
+    ):
+        self.node_url = node_url
+        self.private_key = private_key
+        self.public_key = public_key
+        self.key_created_at = key_created_at
+        self.max_retry = max_retry
+        self.gas_price = gas_price
+        self.gas_limit = gas_limit
+        self.web3 = Web3(Web3.HTTPProvider(self.node_url))
+        self.account_to = account_to
+        self.chain_name = chain_name
+
+    def _get_signed_tx(self, merkle_root: str, gas_price: int, gas_limit: int, try_count: int) -&gt; AttrDict:
+        &#34;&#34;&#34;Prepare a raw transaction and sign it with the private key.&#34;&#34;&#34;
+        nonce = self.web3.eth.getTransactionCount(self.public_key)
+        tx_info = {
+            &#39;nonce&#39;: nonce,
+            &#39;to&#39;: self.account_to,
+            &#39;value&#39;: 0,
+            &#39;gas&#39;: gas_limit,
+            &#39;gasPrice&#39;: gas_price,
+            &#39;data&#39;: merkle_root,
+        }
+        if try_count:
+            tx_info[&#39;nonce&#39;] = tx_info[&#39;nonce&#39;] + try_count
+            tx_info[&#39;gas&#39;] = factor_in_new_try(tx_info[&#39;gas&#39;], try_count)
+            tx_info[&#39;gasPrice&#39;] = factor_in_new_try(tx_info[&#39;gasPrice&#39;], try_count)
+        signed_tx = self.web3.eth.account.sign_transaction(tx_info, self.private_key)
+        return signed_tx
+
+    def _ensure_balance(self) -&gt; None:
+        &#34;&#34;&#34;Make sure that the Ethereum account&#39;s balance is enough to cover the tx costs.&#34;&#34;&#34;
+        assert self.web3.eth.getBalance(self.public_key) &gt;= self.gas_limit * self.gas_price
+
+    def anchor(self, merkle_root) -&gt; str:
+        &#34;&#34;&#34;Store the merkle root as data in an Ethereum transaction and return the tx id.&#34;&#34;&#34;
+        for i in range(self.max_retry):
+            assert self.web3.isConnected()
+            self._ensure_balance()
+            signed_tx = self._get_signed_tx(merkle_root, self.gas_price, self.gas_limit, i)
+            try:
+                tx_hash = self.web3.eth.sendRawTransaction(signed_tx.rawTransaction)
+                tx_id = self.web3.toHex(tx_hash)
+                return tx_id
+            except Exception as e:
+                if i &gt;= self.max_retry - 1:
+                    raise
+                continue
+
+
+class Blockcert:
+    &#34;&#34;&#34;A basic version of a Blockcert as defined by the standard.
+
+    More at:
+        - https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/
+        - http://www.imsglobal.org/sites/default/files/Badges/OBv2p0Final/index.html
+
+
+    :param id: unique id of this specific Blockcert
+    :param issuer: Issuer object, contains info about who issues the Blockcert
+    :param assertion: Assertion object, contains info about what is being claimed by the Issuer about the Recipient
+    :param recipient: Recipient object, contains info about the entity receiving this Blockcert
+    &#34;&#34;&#34;
+
+    def __init__(self, id: str, issuer: Issuer, assertion: Assertion, recipient: Recipient):
+        self.id = id
+        self.issuer = issuer
+        self.assertion = assertion
+        self.recipient = recipient
+        self.anchor_tx_id = None
+        self.proof = None
+
+    def to_dict(self) -&gt; dict:
+        &#34;&#34;&#34;Get a dictionary representation of a Blockcert.&#34;&#34;&#34;
+        raw_dict = {
+            &#34;@context&#34;: [
+                &#34;https://w3id.org/openbadges/v2&#34;,
+                &#34;https://w3id.org/blockcerts/v2&#34;,
+                {
+                    &#34;displayHtml&#34;: {
+                        &#34;@id&#34;: &#34;schema:description&#34;
+                    }
+                }
+            ],
+            &#34;type&#34;: &#34;Assertion&#34;,
+            &#34;issuedOn&#34;: NOW,
+            &#34;id&#34;: &#34;urn:uuid:&#34; + self.id,
+            &#34;recipient&#34;: {
+                &#34;type&#34;: &#34;email&#34;,
+                &#34;identity&#34;: self.recipient.email,
+                &#34;hashed&#34;: self.recipient.email_hashed
+            },
+            &#34;recipientProfile&#34;: {
+                &#34;type&#34;: [
+                    &#34;RecipientProfile&#34;,
+                    &#34;Extension&#34;
+                ],
+                &#34;name&#34;: self.recipient.name,
+                &#34;publicKey&#34;: &#34;ecdsa-koblitz-pubkey:&#34; + self.recipient.public_key
+            },
+            &#34;badge&#34;: {
+                &#34;type&#34;: &#34;BadgeClass&#34;,
+                &#34;id&#34;: &#34;urn:uuid:&#34; + self.assertion.id,
+                &#34;name&#34;: self.assertion.name,
+                &#34;description&#34;: self.assertion.description,
+                &#34;image&#34;: self.assertion.image,
+                &#34;issuer&#34;: {
+                    &#34;id&#34;: self.issuer.url,
+                    &#34;type&#34;: &#34;Profile&#34;,
+                    &#34;name&#34;: self.issuer.name,
+                    &#34;url&#34;: self.issuer.url,
+                    &#34;email&#34;: self.issuer.email,
+                    &#34;image&#34;: self.issuer.image,
+                    &#34;revocationList&#34;: self.issuer.revocation_list
+                },
+                &#34;criteria&#34;: {
+                    &#34;narrative&#34;: self.assertion.narrative
+                }
+            },
+            &#34;verification&#34;: {
+                &#34;type&#34;: [
+                    &#34;MerkleProofVerification2017&#34;,
+                    &#34;Extension&#34;
+                ],
+                &#34;publicKey&#34;: &#34;ecdsa-koblitz-pubkey:&#34; + self.issuer.public_key
+            }
+        }
+        if self.assertion.display_html:
+            raw_dict[&#34;displayHtml&#34;] = self.assertion.display_html,
+        if self.issuer.signature_image and self.issuer.signature_job_title and self.issuer.signature_name:
+            raw_dict[&#39;signatureLines&#39;] = [
+                {
+                    &#34;type&#34;: [
+                        &#34;SignatureLine&#34;,
+                        &#34;Extension&#34;
+                    ],
+                    &#34;jobTitle&#34;: self.issuer.signature_job_title,
+                    &#34;image&#34;: self.issuer.signature_image,
+                    &#34;name&#34;: self.issuer.signature_name
+                }
+            ]
+        if self.proof:
+            raw_dict[&#39;signature&#39;] = self.proof
+
+        return raw_dict
+
+
+class Batch(ABC):
+    &#34;&#34;&#34;Common interface for batching operations.&#34;&#34;&#34;
+
+    @abstractmethod
+    def run(self):
+        &#34;&#34;&#34;Execute all the ordererd steps to create a batch of final certificates.&#34;&#34;&#34;
+        raise NotImplementedError</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="verifiable_credentials.components.AnchorHandler"><code class="flex name class">
+<span>class <span class="ident">AnchorHandler</span></span>
+<span>(</span><span>chain_name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common interface for anchoring mechanisms.</p>
+<p>:param chain_name: name of the chain, for now one of 'ethereumMainnet' or 'ethereumRopsten', in the future at least
+'bitcoinMainnet', 'bitcoinRegtest' and 'bitcoinTestnet' should be added.
+:param signature_field: transaction field where the merkle root will be posted. For now only 'ETHData' will work, in
+the future at least 'BTCOpReturn' should be added.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnchorHandler(ABC):
+    &#34;&#34;&#34;Common interface for anchoring mechanisms.
+
+    :param chain_name: name of the chain, for now one of &#39;ethereumMainnet&#39; or &#39;ethereumRopsten&#39;, in the future at least
+    &#39;bitcoinMainnet&#39;, &#39;bitcoinRegtest&#39; and &#39;bitcoinTestnet&#39; should be added.
+    :param signature_field: transaction field where the merkle root will be posted. For now only &#39;ETHData&#39; will work, in
+    the future at least &#39;BTCOpReturn&#39; should be added.
+    &#34;&#34;&#34;
+
+    def __init__(self, chain_name: str):
+        raise NotImplementedError
+
+    @abstractmethod
+    def anchor(self, data) -&gt; str:
+        &#34;&#34;&#34;Anchor the given data to a Blockchain transaction.
+
+        :param data: data to be stored in a transaction, usually this is a merkle root but it may be a single hash if
+        the batch being issued consists of a single certificate.
+        :return: reference to the anchor, like a transaction id
+        &#34;&#34;&#34;
+        raise NotImplementedError</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="verifiable_credentials.components.EthereumAnchorHandler" href="#verifiable_credentials.components.EthereumAnchorHandler">EthereumAnchorHandler</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="verifiable_credentials.components.AnchorHandler.anchor"><code class="name flex">
+<span>def <span class="ident">anchor</span></span>(<span>self, data)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Anchor the given data to a Blockchain transaction.</p>
+<p>:param data: data to be stored in a transaction, usually this is a merkle root but it may be a single hash if
+the batch being issued consists of a single certificate.
+:return: reference to the anchor, like a transaction id</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def anchor(self, data) -&gt; str:
+    &#34;&#34;&#34;Anchor the given data to a Blockchain transaction.
+
+    :param data: data to be stored in a transaction, usually this is a merkle root but it may be a single hash if
+    the batch being issued consists of a single certificate.
+    :return: reference to the anchor, like a transaction id
+    &#34;&#34;&#34;
+    raise NotImplementedError</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="verifiable_credentials.components.Assertion"><code class="flex name class">
+<span>class <span class="ident">Assertion</span></span>
+<span>(</span><span>id, name, description, image, narrative, display_html='')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A basic version of an Assertion as defined by the Blockcerts standard.</p>
+<p>More at <a href="https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/schema.json">https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/schema.json</a></p>
+<p>:param id: id of the assertion
+:param name: name of the assertion
+:param description: description of the assertion
+:param image: base64-encoded PNG or SVG that represents the assertion (a logo for example)
+:param narrative: narrative of the assertion
+:param display_html: (optional) valid HTML that will be displayed when validating in public validators</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Assertion:
+    &#34;&#34;&#34;A basic version of an Assertion as defined by the Blockcerts standard.
+
+    More at https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/schema.json
+
+    :param id: id of the assertion
+    :param name: name of the assertion
+    :param description: description of the assertion
+    :param image: base64-encoded PNG or SVG that represents the assertion (a logo for example)
+    :param narrative: narrative of the assertion
+    :param display_html: (optional) valid HTML that will be displayed when validating in public validators
+    &#34;&#34;&#34;
+
+    def __init__(self, id: str, name: str, description: str, image: str, narrative: str, display_html: str = &#34;&#34;):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.image = image
+        self.narrative = narrative
+        self.display_html = display_html</code></pre>
+</details>
+</dd>
+<dt id="verifiable_credentials.components.Batch"><code class="flex name class">
+<span>class <span class="ident">Batch</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common interface for batching operations.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Batch(ABC):
+    &#34;&#34;&#34;Common interface for batching operations.&#34;&#34;&#34;
+
+    @abstractmethod
+    def run(self):
+        &#34;&#34;&#34;Execute all the ordererd steps to create a batch of final certificates.&#34;&#34;&#34;
+        raise NotImplementedError</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="verifiable_credentials.issue.BlockcertsBatch" href="issue.html#verifiable_credentials.issue.BlockcertsBatch">BlockcertsBatch</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="verifiable_credentials.components.Batch.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Execute all the ordererd steps to create a batch of final certificates.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def run(self):
+    &#34;&#34;&#34;Execute all the ordererd steps to create a batch of final certificates.&#34;&#34;&#34;
+    raise NotImplementedError</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="verifiable_credentials.components.Blockcert"><code class="flex name class">
+<span>class <span class="ident">Blockcert</span></span>
+<span>(</span><span>id, issuer, assertion, recipient)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A basic version of a Blockcert as defined by the standard.</p>
+<p>More at:
+- <a href="https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/">https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/</a>
+- <a href="http://www.imsglobal.org/sites/default/files/Badges/OBv2p0Final/index.html">http://www.imsglobal.org/sites/default/files/Badges/OBv2p0Final/index.html</a></p>
+<p>:param id: unique id of this specific Blockcert
+:param issuer: Issuer object, contains info about who issues the Blockcert
+:param assertion: Assertion object, contains info about what is being claimed by the Issuer about the Recipient
+:param recipient: Recipient object, contains info about the entity receiving this Blockcert</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Blockcert:
+    &#34;&#34;&#34;A basic version of a Blockcert as defined by the standard.
+
+    More at:
+        - https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/
+        - http://www.imsglobal.org/sites/default/files/Badges/OBv2p0Final/index.html
+
+
+    :param id: unique id of this specific Blockcert
+    :param issuer: Issuer object, contains info about who issues the Blockcert
+    :param assertion: Assertion object, contains info about what is being claimed by the Issuer about the Recipient
+    :param recipient: Recipient object, contains info about the entity receiving this Blockcert
+    &#34;&#34;&#34;
+
+    def __init__(self, id: str, issuer: Issuer, assertion: Assertion, recipient: Recipient):
+        self.id = id
+        self.issuer = issuer
+        self.assertion = assertion
+        self.recipient = recipient
+        self.anchor_tx_id = None
+        self.proof = None
+
+    def to_dict(self) -&gt; dict:
+        &#34;&#34;&#34;Get a dictionary representation of a Blockcert.&#34;&#34;&#34;
+        raw_dict = {
+            &#34;@context&#34;: [
+                &#34;https://w3id.org/openbadges/v2&#34;,
+                &#34;https://w3id.org/blockcerts/v2&#34;,
+                {
+                    &#34;displayHtml&#34;: {
+                        &#34;@id&#34;: &#34;schema:description&#34;
+                    }
+                }
+            ],
+            &#34;type&#34;: &#34;Assertion&#34;,
+            &#34;issuedOn&#34;: NOW,
+            &#34;id&#34;: &#34;urn:uuid:&#34; + self.id,
+            &#34;recipient&#34;: {
+                &#34;type&#34;: &#34;email&#34;,
+                &#34;identity&#34;: self.recipient.email,
+                &#34;hashed&#34;: self.recipient.email_hashed
+            },
+            &#34;recipientProfile&#34;: {
+                &#34;type&#34;: [
+                    &#34;RecipientProfile&#34;,
+                    &#34;Extension&#34;
+                ],
+                &#34;name&#34;: self.recipient.name,
+                &#34;publicKey&#34;: &#34;ecdsa-koblitz-pubkey:&#34; + self.recipient.public_key
+            },
+            &#34;badge&#34;: {
+                &#34;type&#34;: &#34;BadgeClass&#34;,
+                &#34;id&#34;: &#34;urn:uuid:&#34; + self.assertion.id,
+                &#34;name&#34;: self.assertion.name,
+                &#34;description&#34;: self.assertion.description,
+                &#34;image&#34;: self.assertion.image,
+                &#34;issuer&#34;: {
+                    &#34;id&#34;: self.issuer.url,
+                    &#34;type&#34;: &#34;Profile&#34;,
+                    &#34;name&#34;: self.issuer.name,
+                    &#34;url&#34;: self.issuer.url,
+                    &#34;email&#34;: self.issuer.email,
+                    &#34;image&#34;: self.issuer.image,
+                    &#34;revocationList&#34;: self.issuer.revocation_list
+                },
+                &#34;criteria&#34;: {
+                    &#34;narrative&#34;: self.assertion.narrative
+                }
+            },
+            &#34;verification&#34;: {
+                &#34;type&#34;: [
+                    &#34;MerkleProofVerification2017&#34;,
+                    &#34;Extension&#34;
+                ],
+                &#34;publicKey&#34;: &#34;ecdsa-koblitz-pubkey:&#34; + self.issuer.public_key
+            }
+        }
+        if self.assertion.display_html:
+            raw_dict[&#34;displayHtml&#34;] = self.assertion.display_html,
+        if self.issuer.signature_image and self.issuer.signature_job_title and self.issuer.signature_name:
+            raw_dict[&#39;signatureLines&#39;] = [
+                {
+                    &#34;type&#34;: [
+                        &#34;SignatureLine&#34;,
+                        &#34;Extension&#34;
+                    ],
+                    &#34;jobTitle&#34;: self.issuer.signature_job_title,
+                    &#34;image&#34;: self.issuer.signature_image,
+                    &#34;name&#34;: self.issuer.signature_name
+                }
+            ]
+        if self.proof:
+            raw_dict[&#39;signature&#39;] = self.proof
+
+        return raw_dict</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="verifiable_credentials.components.Blockcert.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Get a dictionary representation of a Blockcert.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict:
+    &#34;&#34;&#34;Get a dictionary representation of a Blockcert.&#34;&#34;&#34;
+    raw_dict = {
+        &#34;@context&#34;: [
+            &#34;https://w3id.org/openbadges/v2&#34;,
+            &#34;https://w3id.org/blockcerts/v2&#34;,
+            {
+                &#34;displayHtml&#34;: {
+                    &#34;@id&#34;: &#34;schema:description&#34;
+                }
+            }
+        ],
+        &#34;type&#34;: &#34;Assertion&#34;,
+        &#34;issuedOn&#34;: NOW,
+        &#34;id&#34;: &#34;urn:uuid:&#34; + self.id,
+        &#34;recipient&#34;: {
+            &#34;type&#34;: &#34;email&#34;,
+            &#34;identity&#34;: self.recipient.email,
+            &#34;hashed&#34;: self.recipient.email_hashed
+        },
+        &#34;recipientProfile&#34;: {
+            &#34;type&#34;: [
+                &#34;RecipientProfile&#34;,
+                &#34;Extension&#34;
+            ],
+            &#34;name&#34;: self.recipient.name,
+            &#34;publicKey&#34;: &#34;ecdsa-koblitz-pubkey:&#34; + self.recipient.public_key
+        },
+        &#34;badge&#34;: {
+            &#34;type&#34;: &#34;BadgeClass&#34;,
+            &#34;id&#34;: &#34;urn:uuid:&#34; + self.assertion.id,
+            &#34;name&#34;: self.assertion.name,
+            &#34;description&#34;: self.assertion.description,
+            &#34;image&#34;: self.assertion.image,
+            &#34;issuer&#34;: {
+                &#34;id&#34;: self.issuer.url,
+                &#34;type&#34;: &#34;Profile&#34;,
+                &#34;name&#34;: self.issuer.name,
+                &#34;url&#34;: self.issuer.url,
+                &#34;email&#34;: self.issuer.email,
+                &#34;image&#34;: self.issuer.image,
+                &#34;revocationList&#34;: self.issuer.revocation_list
+            },
+            &#34;criteria&#34;: {
+                &#34;narrative&#34;: self.assertion.narrative
+            }
+        },
+        &#34;verification&#34;: {
+            &#34;type&#34;: [
+                &#34;MerkleProofVerification2017&#34;,
+                &#34;Extension&#34;
+            ],
+            &#34;publicKey&#34;: &#34;ecdsa-koblitz-pubkey:&#34; + self.issuer.public_key
+        }
+    }
+    if self.assertion.display_html:
+        raw_dict[&#34;displayHtml&#34;] = self.assertion.display_html,
+    if self.issuer.signature_image and self.issuer.signature_job_title and self.issuer.signature_name:
+        raw_dict[&#39;signatureLines&#39;] = [
+            {
+                &#34;type&#34;: [
+                    &#34;SignatureLine&#34;,
+                    &#34;Extension&#34;
+                ],
+                &#34;jobTitle&#34;: self.issuer.signature_job_title,
+                &#34;image&#34;: self.issuer.signature_image,
+                &#34;name&#34;: self.issuer.signature_name
+            }
+        ]
+    if self.proof:
+        raw_dict[&#39;signature&#39;] = self.proof
+
+    return raw_dict</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="verifiable_credentials.components.EthereumAnchorHandler"><code class="flex name class">
+<span>class <span class="ident">EthereumAnchorHandler</span></span>
+<span>(</span><span>node_url, public_key, private_key, key_created_at, max_retry=3, gas_price=20000000000, gas_limit=25000, account_to='0xdeaDDeADDEaDdeaDdEAddEADDEAdDeadDEADDEaD', chain_name='ethereumRopsten')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Use the Ethereum blockchain to anchor.</p>
+<p>:param node_url: url to an Ethereum node (can also be a 3rd party service url as Infura)
+:param public_key: Public key to use to sign the transaction (the personal account must be funded)
+:param private_key: Public key to use to sign the transaction (the personal account must be funded)
+:param key_created_at: Ethereum account creation date.
+:param max_retry: (optional) Amount of allowed retries if the anchoring operation fails
+:param gas_price: (optional) desired gas price for the anchoring transaction
+:param gas_limit: (optional) desired gas limit for the anchoring transaction
+:param account_to: (optional) desired destination of the anchoring transaction
+:param chain_name: (optional) one of ethereumRopsten or ethereumMainnet</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class EthereumAnchorHandler(AnchorHandler):
+    &#34;&#34;&#34;Use the Ethereum blockchain to anchor.
+
+    :param node_url: url to an Ethereum node (can also be a 3rd party service url as Infura)
+    :param public_key: Public key to use to sign the transaction (the personal account must be funded)
+    :param private_key: Public key to use to sign the transaction (the personal account must be funded)
+    :param key_created_at: Ethereum account creation date.
+    :param max_retry: (optional) Amount of allowed retries if the anchoring operation fails
+    :param gas_price: (optional) desired gas price for the anchoring transaction
+    :param gas_limit: (optional) desired gas limit for the anchoring transaction
+    :param account_to: (optional) desired destination of the anchoring transaction
+    :param chain_name: (optional) one of ethereumRopsten or ethereumMainnet
+    &#34;&#34;&#34;
+    signature_field = &#39;ETHData&#39;
+
+    def __init__(
+            self,
+            node_url: str,
+            public_key: str,
+            private_key: str,
+            key_created_at: str,
+            max_retry: int = 3,
+            gas_price: int = 20000000000,
+            gas_limit: int = 25000,
+            account_to: str = &#39;0xdeaDDeADDEaDdeaDdEAddEADDEAdDeadDEADDEaD&#39;,
+            chain_name: str = &#39;ethereumRopsten&#39;
+    ):
+        self.node_url = node_url
+        self.private_key = private_key
+        self.public_key = public_key
+        self.key_created_at = key_created_at
+        self.max_retry = max_retry
+        self.gas_price = gas_price
+        self.gas_limit = gas_limit
+        self.web3 = Web3(Web3.HTTPProvider(self.node_url))
+        self.account_to = account_to
+        self.chain_name = chain_name
+
+    def _get_signed_tx(self, merkle_root: str, gas_price: int, gas_limit: int, try_count: int) -&gt; AttrDict:
+        &#34;&#34;&#34;Prepare a raw transaction and sign it with the private key.&#34;&#34;&#34;
+        nonce = self.web3.eth.getTransactionCount(self.public_key)
+        tx_info = {
+            &#39;nonce&#39;: nonce,
+            &#39;to&#39;: self.account_to,
+            &#39;value&#39;: 0,
+            &#39;gas&#39;: gas_limit,
+            &#39;gasPrice&#39;: gas_price,
+            &#39;data&#39;: merkle_root,
+        }
+        if try_count:
+            tx_info[&#39;nonce&#39;] = tx_info[&#39;nonce&#39;] + try_count
+            tx_info[&#39;gas&#39;] = factor_in_new_try(tx_info[&#39;gas&#39;], try_count)
+            tx_info[&#39;gasPrice&#39;] = factor_in_new_try(tx_info[&#39;gasPrice&#39;], try_count)
+        signed_tx = self.web3.eth.account.sign_transaction(tx_info, self.private_key)
+        return signed_tx
+
+    def _ensure_balance(self) -&gt; None:
+        &#34;&#34;&#34;Make sure that the Ethereum account&#39;s balance is enough to cover the tx costs.&#34;&#34;&#34;
+        assert self.web3.eth.getBalance(self.public_key) &gt;= self.gas_limit * self.gas_price
+
+    def anchor(self, merkle_root) -&gt; str:
+        &#34;&#34;&#34;Store the merkle root as data in an Ethereum transaction and return the tx id.&#34;&#34;&#34;
+        for i in range(self.max_retry):
+            assert self.web3.isConnected()
+            self._ensure_balance()
+            signed_tx = self._get_signed_tx(merkle_root, self.gas_price, self.gas_limit, i)
+            try:
+                tx_hash = self.web3.eth.sendRawTransaction(signed_tx.rawTransaction)
+                tx_id = self.web3.toHex(tx_hash)
+                return tx_id
+            except Exception as e:
+                if i &gt;= self.max_retry - 1:
+                    raise
+                continue</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="verifiable_credentials.components.AnchorHandler" href="#verifiable_credentials.components.AnchorHandler">AnchorHandler</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="verifiable_credentials.components.EthereumAnchorHandler.signature_field"><code class="name">var <span class="ident">signature_field</span></code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to sys.getdefaultencoding().
+errors defaults to 'strict'.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="verifiable_credentials.components.EthereumAnchorHandler.anchor"><code class="name flex">
+<span>def <span class="ident">anchor</span></span>(<span>self, merkle_root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Store the merkle root as data in an Ethereum transaction and return the tx id.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def anchor(self, merkle_root) -&gt; str:
+    &#34;&#34;&#34;Store the merkle root as data in an Ethereum transaction and return the tx id.&#34;&#34;&#34;
+    for i in range(self.max_retry):
+        assert self.web3.isConnected()
+        self._ensure_balance()
+        signed_tx = self._get_signed_tx(merkle_root, self.gas_price, self.gas_limit, i)
+        try:
+            tx_hash = self.web3.eth.sendRawTransaction(signed_tx.rawTransaction)
+            tx_id = self.web3.toHex(tx_hash)
+            return tx_id
+        except Exception as e:
+            if i &gt;= self.max_retry - 1:
+                raise
+            continue</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="verifiable_credentials.components.Issuer"><code class="flex name class">
+<span>class <span class="ident">Issuer</span></span>
+<span>(</span><span>name, url, email, image, revocation_list, public_key, signature_name='', signature_job_title='', signature_image='')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A basic version of an Issuer as defined by the Blockcerts standard.</p>
+<p>More at: <a href="https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/issuerSchema.json">https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/issuerSchema.json</a></p>
+<p>:param name: Name of the issuer
+:param url: Url to the issuer's public profile (must resolve to a valid jsonld)
+:param email: Email to contact the issuer
+:param image: base64-encoded PNG or SVG that represents the issuer (a logo for example)
+:param revocation_list: Url to the issuer's public revocation list (must resolve to a valid jsonld)
+:param public_key: Public key owned by the issuer (or authorized to issue on their behalf).
+:param signature_name: (optional) Name of the person signing the certificate
+:param signature_job_title: (optional) Title of the person signing the certificate
+:param signature_image: (optional) base64-encoded PNG or SVG that represents the signature of the person signing.</p>
+<p>Note: All three of signature_name, signature_job_title and signature_image must exist in order for the signature
+section to be added to the Blockcert.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Issuer:
+    &#34;&#34;&#34;A basic version of an Issuer as defined by the Blockcerts standard.
+
+    More at: https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/issuerSchema.json
+
+    :param name: Name of the issuer
+    :param url: Url to the issuer&#39;s public profile (must resolve to a valid jsonld)
+    :param email: Email to contact the issuer
+    :param image: base64-encoded PNG or SVG that represents the issuer (a logo for example)
+    :param revocation_list: Url to the issuer&#39;s public revocation list (must resolve to a valid jsonld)
+    :param public_key: Public key owned by the issuer (or authorized to issue on their behalf).
+    :param signature_name: (optional) Name of the person signing the certificate
+    :param signature_job_title: (optional) Title of the person signing the certificate
+    :param signature_image: (optional) base64-encoded PNG or SVG that represents the signature of the person signing.
+
+    Note: All three of signature_name, signature_job_title and signature_image must exist in order for the signature
+    section to be added to the Blockcert.
+    &#34;&#34;&#34;
+
+    def __init__(
+            self: str,
+            name: str,
+            url: str,
+            email: str,
+            image: str,
+            revocation_list: str,
+            public_key: str,
+            signature_name: str = &#34;&#34;,
+            signature_job_title: str = &#34;&#34;,
+            signature_image: str = &#34;&#34;
+    ):
+        self.name = name
+        self.url = url
+        self.email = email
+        self.image = image
+        self.revocation_list = revocation_list
+        self.public_key = public_key
+        self.signature_name = signature_name
+        self.signature_job_title = signature_job_title
+        self.signature_image = signature_image</code></pre>
+</details>
+</dd>
+<dt id="verifiable_credentials.components.Recipient"><code class="flex name class">
+<span>class <span class="ident">Recipient</span></span>
+<span>(</span><span>name, email, public_key, email_hashed=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A basic version of a Recipient as defined by the Blockcerts standard.</p>
+<p>More at <a href="https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/recipientSchema.json">https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/recipientSchema.json</a></p>
+<p>:param name: name of the recipient
+:param email: email of the recipient
+:param public_key: public key of the recipient
+:param email_hashed: is the email hashed?</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Recipient:
+    &#34;&#34;&#34;A basic version of a Recipient as defined by the Blockcerts standard.
+
+    More at https://github.com/IMSGlobal/cert-schema/blob/master/cert_schema/2.0/recipientSchema.json
+
+    :param name: name of the recipient
+    :param email: email of the recipient
+    :param public_key: public key of the recipient
+    :param email_hashed: is the email hashed?
+    &#34;&#34;&#34;
+
+    def __init__(self, name: str, email: str, public_key: str, email_hashed: bool = False):
+        self.name = name
+        self.email = email
+        self.public_key = public_key
+        self.email_hashed = email_hashed</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="verifiable_credentials" href="../index.html">verifiable_credentials</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="verifiable_credentials.components.AnchorHandler" href="#verifiable_credentials.components.AnchorHandler">AnchorHandler</a></code></h4>
+<ul class="">
+<li><code><a title="verifiable_credentials.components.AnchorHandler.anchor" href="#verifiable_credentials.components.AnchorHandler.anchor">anchor</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="verifiable_credentials.components.Assertion" href="#verifiable_credentials.components.Assertion">Assertion</a></code></h4>
+</li>
+<li>
+<h4><code><a title="verifiable_credentials.components.Batch" href="#verifiable_credentials.components.Batch">Batch</a></code></h4>
+<ul class="">
+<li><code><a title="verifiable_credentials.components.Batch.run" href="#verifiable_credentials.components.Batch.run">run</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="verifiable_credentials.components.Blockcert" href="#verifiable_credentials.components.Blockcert">Blockcert</a></code></h4>
+<ul class="">
+<li><code><a title="verifiable_credentials.components.Blockcert.to_dict" href="#verifiable_credentials.components.Blockcert.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="verifiable_credentials.components.EthereumAnchorHandler" href="#verifiable_credentials.components.EthereumAnchorHandler">EthereumAnchorHandler</a></code></h4>
+<ul class="">
+<li><code><a title="verifiable_credentials.components.EthereumAnchorHandler.anchor" href="#verifiable_credentials.components.EthereumAnchorHandler.anchor">anchor</a></code></li>
+<li><code><a title="verifiable_credentials.components.EthereumAnchorHandler.signature_field" href="#verifiable_credentials.components.EthereumAnchorHandler.signature_field">signature_field</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="verifiable_credentials.components.Issuer" href="#verifiable_credentials.components.Issuer">Issuer</a></code></h4>
+</li>
+<li>
+<h4><code><a title="verifiable_credentials.components.Recipient" href="#verifiable_credentials.components.Recipient">Recipient</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.2</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
