@@ -2,6 +2,7 @@
 
 > Easily issue verifiable credentials (like Blockcerts)
     
+![](https://github.com/docknetwork/vcpy/workflows/pytest/badge.svg)
 
 ## Table of contents
 1. [Background](#background)
