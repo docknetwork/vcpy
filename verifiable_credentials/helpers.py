@@ -1,8 +1,9 @@
 import hashlib
 from datetime import datetime, timezone
 
-from chainpoint.chainpoint import MerkleTools
 from pycoin.serialize import h2b
+
+from merkletools import MerkleTools
 
 
 def hash_byte_array(data):
@@ -16,7 +17,7 @@ def ensure_string(value):
     return value.decode('utf-8')
 
 
-class MerkleTree(object):
+class MerkleTree:
     """Representation of a Merkle Tree.
 
     More at https://en.wikipedia.org/wiki/Merkle_tree.
@@ -55,7 +56,7 @@ class MerkleTree(object):
         :return:
         """
         root = ensure_string(self.tree.get_merkle_root())
-        node_count = len(self.tree.leaves)
+        node_count = len(self.tree.leafs)
         for index in range(0, node_count):
             proof = self.tree.get_proof(index)
             proof2 = []

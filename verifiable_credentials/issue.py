@@ -1,12 +1,13 @@
 # COMPONENTS ============================
 import copy
 import uuid
-from typing import List, Generator, Dict, Tuple
+from typing import Dict, Generator, List, Tuple
 
 from pyld import jsonld
 
-from .components import Issuer, Assertion, Recipient, AnchorHandler, Blockcert, Batch
-from .helpers import MerkleTree, NOW
+from .components import (AnchorHandler, Assertion, Batch, Blockcert, Issuer,
+                         Recipient)
+from .helpers import NOW, MerkleTree
 
 
 class BlockcertsBatch(Batch):
@@ -85,7 +86,7 @@ class BlockcertsBatch(Batch):
 
     def _get_cert_generator(self) -> Generator:
         """Return a generator of jsonld-normalized unsigned certs."""
-        for uid, cert in self.unsigned_certs.items():
+        for _, cert in self.unsigned_certs.items():
             normalized = jsonld.normalize(cert.to_dict(), {'algorithm': 'URDNA2015', 'format': 'application/n-quads'})
             yield normalized.encode('utf-8')
 
